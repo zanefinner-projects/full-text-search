@@ -43,11 +43,18 @@ func main() {
 	//Set Up Webserver
 	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		//Serve Page
 		serveSearchPage(w, r)
 		log.Println("Page Served")
+		//Do Search
 		search := r.URL.Query()["q"][0]
 		log.Println("Search:", search)
-
+		results := performSearch(search, db)
+		//Return results
+		for _, result := range results {
+			fmt.Fprintf(w, result.Title)
+			fmt.Fprintf(w, "<br>")
+		}
 	})
 	panic(http.ListenAndServe("localhost:8888", router))
 }
@@ -91,4 +98,9 @@ func cleanUp(db *gorm.DB) {
 func serveSearchPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<!doctype HTML>"+form)
 
+}
+func performSearch(search string, db *gorm.DB) []Book {
+	searchObj := []Book{}
+	db.Where("title LIKE ?", "%"+search+"%").Find(&searchObj)
+	return searchObj
 }
