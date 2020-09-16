@@ -48,17 +48,19 @@ func main() {
 		serveSearchPage(w, r)
 		log.Println("Page Served")
 		//Do Search
-		search := r.URL.Query()["q"][0]
-		log.Println("Search:", search)
-		results := performSearch(search, db)
-		//Return results
-		for _, result := range results {
-			fmt.Fprintf(w, "<ul>")
-			fmt.Fprintf(w, "<b>"+result.Title+"</b>")
-			fmt.Fprintf(w, "<li>by "+result.Author+"</li>")
-			fmt.Fprintf(w, "<li>"+strconv.Itoa(result.Year)+"</li>")
-			fmt.Fprintf(w, "</ul>")
-			fmt.Fprintf(w, "<br>")
+		if search, ok := r.URL.Query()["q"]; ok {
+			search := search[0]
+			log.Println("Search:", search)
+			results := performSearch(search, db)
+			//Return results
+			for _, result := range results {
+				fmt.Fprintf(w, "<ul>")
+				fmt.Fprintf(w, "<b>"+result.Title+"</b>")
+				fmt.Fprintf(w, "<li>by "+result.Author+"</li>")
+				fmt.Fprintf(w, "<li>"+strconv.Itoa(result.Year)+"</li>")
+				fmt.Fprintf(w, "</ul>")
+				fmt.Fprintf(w, "<br>")
+			}
 		}
 	})
 	panic(http.ListenAndServe("localhost:8888", router))
