@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/gorilla/mux"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -16,6 +19,12 @@ type Book struct {
 	Year   int
 }
 
+var form = `
+	<form action="/" method="get">
+	<input name="q"><button type="submit">Search</button>
+	</form>
+`
+
 func main() {
 	//Set DSN and connect
 	dsn := "zane:52455245@tcp(127.0.0.1:3306)/dummy?charset=utf8mb4&parseTime=True&loc=Local"
@@ -25,12 +34,18 @@ func main() {
 	}
 	//Migrations
 	db.AutoMigrate(&Book{})
+	//Clean Up
+	cleanUp(db)
 
 	//Create Sample records
 	createRecords(db)
 
-	//Clean Up
-	cleanUp(db)
+	//Set Up Webserver
+	router := mux.NewRouter()
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		serveSearchPage(w, r)
+	})
+	panic(http.ListenAndServe("localhost:8888", router))
 }
 func createRecords(db *gorm.DB) {
 	log.Println("Creating records...")
@@ -67,4 +82,9 @@ func createRecords(db *gorm.DB) {
 }
 func cleanUp(db *gorm.DB) {
 	db.Exec("DELETE FROM books")
+}
+
+func serveSearchPage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "<!doctype HTML>"+form)
+
 }
