@@ -45,6 +45,9 @@ func main() {
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		serveSearchPage(w, r)
 		log.Println("Page Served")
+		search := r.URL.Query()["q"][0]
+		log.Println("Search:", search)
+
 	})
 	panic(http.ListenAndServe("localhost:8888", router))
 }
