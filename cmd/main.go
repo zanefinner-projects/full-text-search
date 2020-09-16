@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
@@ -52,7 +53,11 @@ func main() {
 		results := performSearch(search, db)
 		//Return results
 		for _, result := range results {
-			fmt.Fprintf(w, result.Title)
+			fmt.Fprintf(w, "<ul>")
+			fmt.Fprintf(w, "<b>"+result.Title+"</b>")
+			fmt.Fprintf(w, "<li>by "+result.Author+"</li>")
+			fmt.Fprintf(w, "<li>"+strconv.Itoa(result.Year)+"</li>")
+			fmt.Fprintf(w, "</ul>")
 			fmt.Fprintf(w, "<br>")
 		}
 	})
