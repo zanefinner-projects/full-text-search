@@ -44,6 +44,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		serveSearchPage(w, r)
+		log.Println("Page Served")
 	})
 	panic(http.ListenAndServe("localhost:8888", router))
 }
